@@ -34,9 +34,11 @@ func ParseCardinalPoint(raw string) (cp CardinalPoint, err error) {
 const (
 	// LatLong Thresholds (ie: spherical degrees)
 	// Min is the minimum value allowed for a LatLong
-	Min LatLong = -180
+	//MinLong LatLong = -180
+	//MinLat LatLong = -90
 	// Max is the maximum value allowed for a LatLong
-	Max LatLong = 180
+	MaxLong float64 = 180
+	MaxLat  float64 = 90
 )
 
 type LatLong float64
@@ -57,9 +59,6 @@ func NewLatLong(raw string) (l LatLong, err error) {
 		return
 	}
 
-	if l < Min || l > Max {
-		err = fmt.Errorf("invalid range (got: %f)", l)
-	}
 	return
 }
 
@@ -95,6 +94,19 @@ func ParseDM(raw string) (LatLong, error) {
 	d := math.Floor(dm / 100) // div dm by 100 and truncate decimal value to get only degrees
 	m := dm - (d * 100)       // Sub degrees to dm value
 	dm = d + m/60             // switch minute to degree to get value in the same referential
+
+	switch dir {
+	case North, South:
+		if math.Abs(dm) > MaxLat {
+			return 0, fmt.Errorf("invalid range (got: %f)", dm)
+		}
+	case East, West:
+		if math.Abs(dm) > MaxLong {
+			return 0, fmt.Errorf("invalid range (got: %f)", dm)
+		}
+	default:
+		return 0, fmt.Errorf("Wrong direction (got: %s)", dir.String())
+	}
 
 	switch dir {
 	case North, East:

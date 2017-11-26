@@ -67,6 +67,7 @@ type GPGSV struct {
 }
 
 func (m *GPGSV) parse() (err error) {
+	//log.Printf("GSV: %d fields\n", len(m.Fields))
 	if len(m.Fields) < 3 || (len(m.Fields)-3)%4 != 0 {
 		return m.Error(fmt.Errorf("Invalid message size (got: %d)", len(m.Fields)))
 	}
