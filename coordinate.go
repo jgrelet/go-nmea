@@ -78,7 +78,7 @@ func ParseDM(raw string) (LatLong, error) {
 	)
 
 	if len(raw) < 2 {
-		return LatLong(0), fmt.Errorf("Wrong DM format, got: \"%s\"", raw)
+		return LatLong(0), fmt.Errorf("nmea.ParseDM() Wrong DM format, got: \"%s\"", raw)
 	}
 
 	// Explode data
@@ -98,14 +98,14 @@ func ParseDM(raw string) (LatLong, error) {
 	switch dir {
 	case North, South:
 		if math.Abs(dm) > MaxLat {
-			return 0, fmt.Errorf("invalid range (got: %f)", dm)
+			return 0, fmt.Errorf("nmea.ParseDM() invalid range (got: %f)", dm)
 		}
 	case East, West:
 		if math.Abs(dm) > MaxLong {
-			return 0, fmt.Errorf("invalid range (got: %f)", dm)
+			return 0, fmt.Errorf("nmea.ParseDM() invalid range (got: %f)", dm)
 		}
 	default:
-		return 0, fmt.Errorf("Wrong direction (got: %s)", dir.String())
+		return 0, fmt.Errorf("nmea.ParseDM() Wrong direction (got: %s)", dir.String())
 	}
 
 	switch dir {
@@ -114,7 +114,7 @@ func ParseDM(raw string) (LatLong, error) {
 	case South, West:
 		return LatLong(0 - dm), nil
 	default:
-		return 0, fmt.Errorf("Wrong direction (got: %s)", dir.String())
+		return 0, fmt.Errorf("nmea.ParseDM() Wrong direction (got: %s)", dir.String())
 	}
 }
 
@@ -140,16 +140,28 @@ func (l LatLong) CardinalPoint(isLatitude bool) CardinalPoint {
 
 // DM extract degrees and minutes
 func (l LatLong) DM() (int, float64) {
-	d := math.Floor(float64(l))
-	m := (float64(l) - d) * 60
+	var d, m float64
+	if l >= 0 {
+		d = math.Floor(float64(l))
+		m = (float64(l) - d) * 60
+	} else {
+		d = math.Ceil(float64(l))
+		m = (math.Abs(float64(l)) - math.Abs(d)) * 60
+	}
+	// fmt.Println(d, m)
 	return int(d), m
 }
 
 // DMS extract degrees, minutes and secondes
 func (l LatLong) DMS() (int, int, float64) {
+	var s float64
 	d, m := l.DM()
 	m = math.Floor(m)
-	s := (float64(l) - (float64(d) + (m / 60))) * 60 * 60 // TODO: round secondes
+	if l >= 0 {
+		s = (float64(l) - (float64(d) + (m / 60))) * 60 * 60 // TODO: round secondes
+	} else {
+		s = (float64(l) + (math.Abs(float64(d)) + (m / 60))) * 60 * 60 // TODO: round secondes
+	}
 	return d, int(m), s
 }
 
@@ -159,7 +171,7 @@ func (l LatLong) ToDM() string {
 		return ""
 	}
 	d, m := l.DM()
-	return strings.Trim(fmt.Sprintf("%d%f", d, m), "0")
+	return strings.Trim(fmt.Sprintf("%02d%09.6f", d, m), "0")
 }
 
 // PrintDMS return string like: dd° mm' ss.ss" to be human readable
