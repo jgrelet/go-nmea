@@ -89,18 +89,21 @@ func (m *GPGGA) parse() (err error) {
 	return nil
 }
 
+// Serialize return a valid payload as string
 func (m GPGGA) Serialize() string { // Implement NMEA interface
 
 	hdr := TypeIDs["GPGGA"]
 	fields := make([]string, 0)
-
+	////////
+	//fmt.Printf("Lat: %s Lon: %s\n", m.Latitude.ToDM(), m.Longitude.ToDM())
 	fields = append(fields, m.TimeUTC.Format("150405.000"),
 		strings.Trim(m.Latitude.ToDM(), "0"), m.Latitude.CardinalPoint(true).String(),
 		strings.Trim(m.Longitude.ToDM(), "0"), m.Longitude.CardinalPoint(false).String(),
 		strconv.Itoa(int(m.QualityIndicator)),
 		strconv.Itoa(int(m.NbOfSatellitesUsed)),
 	)
-
+	/////////
+	//fmt.Println(fields)
 	if m.HDOP > 0 {
 		fields = append(fields, fmt.Sprintf("%.1f", m.HDOP))
 	} else {
