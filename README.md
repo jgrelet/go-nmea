@@ -1,6 +1,6 @@
 # go-nmea [![Go Report Card](https://goreportcard.com/badge/github.com/pilebones/go-nmea)](https://goreportcard.com/report/github.com/pilebones/go-nmea) [![GoDoc](https://godoc.org/github.com/pilebones/go-nmea?status.svg)](https://godoc.org/github.com/pilebones/go-nmea) [![Build Status](https://travis-ci.org/pilebones/go-nmea.svg?branch=master)](https://travis-ci.org/pilebones/go-nmea)
 
-A Golang library for decode standard and proprietary NMEA packet message (GPS information dissector).
+This is a fork of the Golang library go-nmea for decode standard and proprietary NMEA packet message (GPS information dissector) with some fixes and improvements.
 
 Tested with this [GPS Module](http://wiki.52pi.com/index.php/USB-Port-GPS_Module_SKU:EZ-0048) cover [L80 gps protocol specification v1.0.pdf](http://wiki.52pi.com/index.php/File:L80_gps_protocol_specification_v1.0.pdf).
 See another [NMEA specification](http://aprs.gids.nl/nmea/).
