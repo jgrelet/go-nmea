@@ -30,13 +30,13 @@ type GPDBT struct {
 	Message
 
 	DepthInFeet    float64
-	DephtInMeters  float64
-	DephtInFathoms float64
+	DepthInMeters  float64
+	DepthInFathoms float64
 }
 
 func (m *GPDBT) parse() (err error) {
-	if len(m.Fields) != 7 {
-		return m.Error(fmt.Errorf("Incomplete GPDBT message, not enougth data fields (got: %d, wanted: %d)", len(m.Fields), 9))
+	if len(m.Fields) != 6 {
+		return m.Error(fmt.Errorf("Incomplete GPDBT message, not enougth data fields (got: %d, wanted: %d)", len(m.Fields), 6))
 	}
 
 	// Validate fixed field
@@ -50,11 +50,11 @@ func (m *GPDBT) parse() (err error) {
 		return m.Error(fmt.Errorf("Unable to parse depth in feet from data field (got: %s)", m.Fields[0]))
 	}
 
-	if m.DephtInMeters, err = strconv.ParseFloat(m.Fields[4], 64); err != nil {
+	if m.DepthInMeters, err = strconv.ParseFloat(m.Fields[2], 64); err != nil {
 		return m.Error(fmt.Errorf("Unable to parse depth in meters from data field (got: %s)", m.Fields[4]))
 	}
 
-	if m.DephtInFathoms, err = strconv.ParseFloat(m.Fields[6], 64); err != nil {
+	if m.DepthInFathoms, err = strconv.ParseFloat(m.Fields[4], 64); err != nil {
 		return m.Error(fmt.Errorf("Unable to parse depth in fathoms from data field (got: %s)", m.Fields[6]))
 	}
 
