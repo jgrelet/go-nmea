@@ -148,6 +148,10 @@ func Parse(raw string) (NMEA, error) {
 		gptxt := NewGPTXT(*m)
 		err = gptxt.parse()
 		return gptxt, err
+	case "GPDBT":
+		gpdbt := NewGPDBT(*m)
+		err = gpdbt.parse()
+		return gpdbt, err
 	}
 
 	return m, err
