@@ -124,7 +124,7 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 		strings.Trim(m.Latitude.ToDM(), "0"), m.Latitude.CardinalPoint(true).String(),
 		strings.Trim(m.Longitude.ToDM(), "0"), m.Longitude.CardinalPoint(false).String(),
 		strconv.Itoa(int(m.QualityIndicator)),
-		fmt.Sprintf("%02d", int(m.NbOfSatellitesUsed)),
+		fmt.Sprintf("%d", int(m.NbOfSatellitesUsed)),
 	)
 	/////////
 	//fmt.Println(fields)
