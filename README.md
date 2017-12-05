@@ -7,7 +7,7 @@ See another [NMEA specification](http://aprs.gids.nl/nmea/).
 
 ## NMEA Specification
 
-NMEA standard specification provide 58 kind of message with different structure. 
+NMEA standard specification provide 58 kind of message with different structure.
 And more according to GPS devices manufacturer (ex: 40 proprietary message identified prefixed by `PMTK` for `L80 GPS protocol specification`).
 
 Syntax: `$<talker_id><message_id>[<data-fields>...]*<checksum><CRLF>`
@@ -37,23 +37,24 @@ import "fmt"
 import nmea "github.com/pilebones/go-nmea"
 
 func main() {
-	raw := "$GPGGA,015540.000,3150.68378,N,11711.93139,E,1,17,0.6,0051.6,M,0.0,M,,*58"
-	
-	fmt.Println("Parsing NMEA message:", raw)
-	msg, err := nmea.Parse(raw)
-	if err != nil {
-		fmt.Println("Unable to decode nmea message, err:", err.Error())
-		return
-	}
+    raw := "$GPGGA,015540.000,3150.68378,N,11711.93139,E,1,17,0.6,0051.6,M,0.0,M,,*58"
 
-	// TODO: Handling complex struct depending on kind of nmea message
+    fmt.Println("Parsing NMEA message:", raw)
+    msg, err := nmea.Parse(raw)
+    if err != nil {
+        fmt.Println("Unable to decode nmea message, err:", err.Error())
+        return
+    }
 
-	fmt.Println("Craft NMEA packets using Serialize():", msg.Serialize())
+    // TODO: Handling complex struct depending on kind of nmea message
+
+    fmt.Println("Craft NMEA packets using Serialize():", msg.Serialize())
 }
 ```
 
 ## Documentation
-- [GoDoc Reference](http://godoc.org/github.com/pilebones/go-nmea).
+
+* [GoDoc Reference](http://godoc.org/github.com/pilebones/go-nmea).
 
 ## License
 
