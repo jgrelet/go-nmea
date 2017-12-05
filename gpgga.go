@@ -24,7 +24,9 @@ type GPGGA struct {
 	NbOfSatellitesUsed uint64
 	HDOP               float64
 	Altitude           float64
-	GeoIdSep           *float64
+	GeoIDSep           *float64
+	DGPSAge            *float64
+	DGPSStationID      *uint8
 
 	// FIXME: Manage field below when I found a sample with no-empty data
 	// DGPSAge        *uint64
@@ -78,12 +80,34 @@ func (m *GPGGA) parse() (err error) {
 		}
 	}
 
-	if geoIdSep := m.Fields[10]; len(geoIdSep) > 0 {
+	if geoIDSep := m.Fields[10]; len(geoIDSep) > 0 {
 		id, err := strconv.ParseFloat(m.Fields[10], 64)
 		if err != nil {
 			return m.Error(err)
 		}
-		m.GeoIdSep = &id
+		m.GeoIDSep = &id
+	}
+
+	// Age of differential GPS data, time in seconds since last SC104
+	// type 1 or 9 update, null field when DGPS is not used
+	if dGPSAge := m.Fields[12]; len(dGPSAge) > 0 {
+		v, err := strconv.ParseFloat(dGPSAge, 64)
+		if err != nil {
+			return m.Error(err)
+		}
+		m.DGPSAge = &v
+	}
+
+	// Differential reference station ID, 0000-1023
+	if dGPSStationID := m.Fields[13]; len(dGPSStationID) > 0 {
+		//fmt.Printf("%T  %v\n", dGPSStationID, dGPSStationID)
+		v, err := strconv.ParseUint(dGPSStationID, 0, 8)
+		//fmt.Printf("%T  %v\n", v, v)
+		if err != nil {
+			return m.Error(err)
+		}
+		r := uint8(v)
+		m.DGPSStationID = &r
 	}
 
 	return nil
@@ -100,18 +124,18 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 		strings.Trim(m.Latitude.ToDM(), "0"), m.Latitude.CardinalPoint(true).String(),
 		strings.Trim(m.Longitude.ToDM(), "0"), m.Longitude.CardinalPoint(false).String(),
 		strconv.Itoa(int(m.QualityIndicator)),
-		strconv.Itoa(int(m.NbOfSatellitesUsed)),
+		fmt.Sprintf("%02d", int(m.NbOfSatellitesUsed)),
 	)
 	/////////
 	//fmt.Println(fields)
 	if m.HDOP > 0 {
-		fields = append(fields, fmt.Sprintf("%.1f", m.HDOP))
+		fields = append(fields, fmt.Sprintf("%03.1f", m.HDOP))
 	} else {
 		fields = append(fields, "")
 	}
 
 	if m.Altitude > 0 {
-		fields = append(fields, PrependXZero(m.Altitude, "%.1f", 4))
+		fields = append(fields, PrependXZero(m.Altitude, "%03.1f", 4))
 
 	} else {
 		fields = append(fields, "")
@@ -119,18 +143,32 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 
 	fields = append(fields, "M")
 
-	if m.GeoIdSep != nil {
-		fields = append(fields, fmt.Sprintf("%.1f", *m.GeoIdSep))
+	if m.GeoIDSep != nil {
+		fields = append(fields, fmt.Sprintf("%03.1f", *m.GeoIDSep))
 	} else {
 		fields = append(fields, "")
 	}
 
-	fields = append(fields,
-		"M",
-		"", // DGPSAge always empty ?
-		"", // DGPSiStationId always empty ?
-	)
+	fields = append(fields, "M")
 
+	if m.DGPSAge != nil {
+		fields = append(fields, fmt.Sprintf("%.1f", *m.DGPSAge))
+	} else {
+		fields = append(fields, "")
+	}
+
+	if m.DGPSStationID != nil {
+		fields = append(fields, fmt.Sprintf("%04d", *m.DGPSStationID))
+	} else {
+		fields = append(fields, "")
+	}
+	/*
+		fields = append(fields,
+			"M",
+			"", // DGPSAge always empty ?
+			"", // DGPSiStationId always empty ?
+		)
+	*/
 	msg := Message{Type: hdr, Fields: fields}
 	msg.Checksum = msg.ComputeChecksum()
 
