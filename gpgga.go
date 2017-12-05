@@ -129,13 +129,13 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 	/////////
 	//fmt.Println(fields)
 	if m.HDOP > 0 {
-		fields = append(fields, fmt.Sprintf("%3.1f", m.HDOP))
+		fields = append(fields, fmt.Sprintf("%03.1f", m.HDOP))
 	} else {
 		fields = append(fields, "")
 	}
 
 	if m.Altitude > 0 {
-		fields = append(fields, PrependXZero(m.Altitude, "%.1f", 4))
+		fields = append(fields, PrependXZero(m.Altitude, "%03.1f", 4))
 
 	} else {
 		fields = append(fields, "")
@@ -144,7 +144,7 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 	fields = append(fields, "M")
 
 	if m.GeoIDSep != nil {
-		fields = append(fields, fmt.Sprintf("%.1f", *m.GeoIDSep))
+		fields = append(fields, fmt.Sprintf("%03.1f", *m.GeoIDSep))
 	} else {
 		fields = append(fields, "")
 	}
@@ -158,7 +158,7 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 	}
 
 	if m.DGPSStationID != nil {
-		fields = append(fields, fmt.Sprintf("%d", *m.DGPSStationID))
+		fields = append(fields, fmt.Sprintf("%04d", *m.DGPSStationID))
 	} else {
 		fields = append(fields, "")
 	}
