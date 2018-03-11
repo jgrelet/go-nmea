@@ -4,6 +4,7 @@ import "fmt"
 
 const (
 	// NMEA special-chars
+
 	// Prefix is special char to begin NMEA message
 	Prefix = "$"
 	// FieldDelimiter is special char to delimit a field in NMEA message

@@ -5,13 +5,31 @@ import (
 	"strconv"
 )
 
-// Examples:
-// $GPVTG,0.0,T,,M,0.0,N,0.1,K,A*0C
+/*
+VTG Track Made Good and Ground Speed
+       1   2 3   4 5   6 7   8 9
+       |   | |   | |   | |   | |
+$--VTG,x.x,T,x.x,M,x.x,N,x.x,K*hh
+1) Track Degrees
+2) T = True
+3) Track Degrees
+4) M = Magnetic
+5) Speed Knots
+6) N = Knots
+7) Speed Kilometers Per Hour
+8) K = Kilometres Per Hour
+9) Checksum
 
+Examples:
+$GPVTG,0.0,T,,M,0.0,N,0.1,K,A*0C
+*/
+
+// NewGPVTG construct VTG message
 func NewGPVTG(m Message) *GPVTG {
 	return &GPVTG{Message: m}
 }
 
+// GPVTG
 type GPVTG struct {
 	Message
 
@@ -50,4 +68,20 @@ func (m *GPVTG) parse() (err error) {
 	}
 
 	return nil
+}
+
+// Serialize return a valid payload as string
+func (m GPVTG) Serialize() string { // Implement NMEA interface
+
+	hdr := TypeIDs["GPVTG"]
+	fields := make([]string, 0)
+	fields = append(fields, fmt.Sprintf("%03.1f", m.COG), "T",
+		"", "M",
+		fmt.Sprintf("%03.1f", m.SpeedKnots), "N",
+		fmt.Sprintf("%03.1f", m.SpeedKmh), "K",
+		string(m.PositioningMode))
+	msg := Message{Type: hdr, Fields: fields}
+	msg.Checksum = msg.ComputeChecksum()
+
+	return msg.Serialize()
 }
