@@ -7,16 +7,39 @@ import (
 	"time"
 )
 
-// Examples:
-// $GPRMC,013732.000,A,3150.7238,N,11711.7278,E,0.00,0.00,220413,,,A*68
-// $GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62
-// $GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
-// $GPRMC,220516,A,5133.82,N,00042.24,W,173.8,231.8,130694,004.2,W*70
+/*
+RMC Recommended Minimum Navigation Information
+       1         2 3       4 5        6 7   8   9   10  11 12
+       |         | |       | |        | |   |   |    |   | |
+$--RMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,xxxx,x.x,a*hh
 
+1) Time (UTC)
+2) Status, V = Navigation receiver warning
+3) Latitude
+4) N or S
+5) Longitude
+6) E or W
+7) Speed over ground, knots
+8) Track made good, degrees true
+9) Date, ddmmyy
+10) Magnetic Variation, degrees
+11) E or W
+12) Checksum
+
+ Examples:
+ $GPRMC,013732.000,A,3150.7238,N,11711.7278,E,0.00,0.00,220413,,,A*68
+ $GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62
+ $GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
+ $GPRMC,220516,A,5133.82,N,00042.24,W,173.8,231.8,130694,004.2,W*70
+*/
+
+// NewGPRMC allocate GPRMC struct for RMC sentence
+// (RMC Recommended Minimum Navigation Information)
 func NewGPRMC(m Message) *GPRMC {
 	return &GPRMC{Message: m}
 }
 
+// GPRMC struct
 type GPRMC struct {
 	Message
 

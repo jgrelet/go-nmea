@@ -14,6 +14,7 @@ for a GPS receiver
        1         2       3 4        5 6 7  8   9  10 11 12 13 14   15
        |         |       | |        | | |  |   |   | |   | |   |    |
 $--GGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh
+
 1) Time (UTC)
 2) Latitude
 3) N or S (North or South)
@@ -39,10 +40,13 @@ Example:
 $GPGGA,015540.000,3150.68378,N,11711.93139,E,1,17,0.6,0051.6,M,0.0,M,,*58
 */
 
+// NewGPGGA allocate GPGGA struct for Global Positioning System Fix Data for a GPS receiver sentence GGA.
+// with Time, Position and fix related data
 func NewGPGGA(m Message) *GPGGA {
 	return &GPGGA{Message: m}
 }
 
+// GPGGA struct
 type GPGGA struct {
 	Message
 
@@ -142,7 +146,7 @@ func (m *GPGGA) parse() (err error) {
 	return nil
 }
 
-// Serialize return a valid payload as string
+// Serialize return a valid sentence GGA as string
 func (m GPGGA) Serialize() string { // Implement NMEA interface
 
 	hdr := TypeIDs["GPGGA"]
@@ -205,13 +209,18 @@ func (m GPGGA) Serialize() string { // Implement NMEA interface
 }
 
 const (
+	// InvalidIndicator const as 0
 	InvalidIndicator = iota
+	// GNSSS const as 1
 	GNSSS
+	// DGPS const as 2
 	DGPS
 )
 
+// QualityIndicator type as int
 type QualityIndicator int
 
+// String return QualityIndicator as human string
 func (s QualityIndicator) String() string {
 	switch s {
 	case InvalidIndicator:
@@ -226,6 +235,8 @@ func (s QualityIndicator) String() string {
 	}
 }
 
+// ParseQualityIndicator check QualityIndicator validity, return an error
+// "unknow value" if not
 func ParseQualityIndicator(raw string) (qi QualityIndicator, err error) {
 	i, err := strconv.ParseInt(raw, 10, 0)
 	if err != nil {

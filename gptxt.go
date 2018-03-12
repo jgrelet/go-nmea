@@ -9,10 +9,12 @@ import (
 // Examples:
 // $GPTXT,01,01,02,ANTSTATUS=OK*3B
 
+// NewGPTXT allocate GPTXT struct for echo-sounder sentence DBT (Depth Below Transducer)
 func NewGPTXT(m Message) *GPTXT {
 	return &GPTXT{Message: m}
 }
 
+// GPTXT struct
 type GPTXT struct {
 	Message
 
@@ -52,6 +54,7 @@ func (m *GPTXT) parse() (err error) {
 	return nil
 }
 
+// Serialize return a valid sentence TXT as string
 func (m GPTXT) Serialize() string { // Implement NMEA interface
 
 	hdr := TypeIDs["GPTXT"]
@@ -77,6 +80,7 @@ func (m GPTXT) Serialize() string { // Implement NMEA interface
 	return msg.Serialize()
 }
 
+// Env return antenna map status
 func (m GPTXT) Env() map[string]string {
 	if fields := strings.SplitN(m.TxtMsg, "=", 2); len(fields) == 2 {
 		return map[string]string{
@@ -86,6 +90,7 @@ func (m GPTXT) Env() map[string]string {
 	return nil
 }
 
+// AntennaStatus return status as human string
 func (m GPTXT) AntennaStatus() *string {
 	env := m.Env()
 	if env == nil {

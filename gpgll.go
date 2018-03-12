@@ -6,13 +6,31 @@ import (
 	"time"
 )
 
-// Examples:
-// $GPGLL,3110.2908,N,12123.2348,E,041139.000,A,A*59
+/*
+GLL Geographic Position – Latitude/Longitude
+       1       2 3        4 5         6 7
+       |       | |        | |         | |
+$--GLL,llll.ll,a,yyyyy.yy,a,hhmmss.ss,A*hh
 
+1) Latitude
+2) N or S (North or South)
+3) Longitude
+4) E or W (East or West)
+5) Time (UTC)
+6) Status A - Data Valid, V - Data Invalid
+7) Checksum
+
+Example:
+$GPGLL,3110.2908,N,12123.2348,E,041139.000,A,A*59
+*/
+
+// NewGPGLL allocate struct GPGLL for GLL sentence GLL (Geographic Position)
+// with Latitude/Longitude
 func NewGPGLL(m Message) *GPGLL {
 	return &GPGLL{Message: m}
 }
 
+// GPGLL struct
 type GPGLL struct {
 	Message
 
@@ -50,4 +68,20 @@ func (m *GPGLL) parse() (err error) {
 	}
 
 	return nil
+}
+
+// Serialize return a valid sentence GLL as string
+func (m GPGLL) Serialize() string { // Implement NMEA interface
+
+	hdr := TypeIDs["GPGLL"]
+	fields := make([]string, 0)
+	fields = append(fields,
+		m.TimeUTC.Format("150405.000"),
+		strings.Trim(m.Latitude.ToDM(), "0"), m.Latitude.CardinalPoint(true).String(),
+		strings.Trim(m.Longitude.ToDM(), "0"), m.Longitude.CardinalPoint(false).String(),
+		string(m.IsValid.Serialize()))
+	msg := Message{Type: hdr, Fields: fields}
+	msg.Checksum = msg.ComputeChecksum()
+
+	return msg.Serialize()
 }

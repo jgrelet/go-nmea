@@ -5,22 +5,25 @@ import (
 	"strconv"
 )
 
-// Examples:
-// $MXDBT,108.34,f,33.02,M,18.06,F,*09
-// $INDBT,,,000033.0,M,,*06
-//         1  2  3  4  5  6 7
-//         |  |  |  |  |  | |
-// $--DBT,x.x,f,x.x,M,x.x,F*hh
-//
-// 1) Depth, feet
-// 2) f = feet
-// 3) Depth, meters
-// 4) M = meters
-// 5) Depth, Fathoms
-// 6) F = Fathoms
-// 7) Checksum
+/*
+ $INDBT,,,000033.0,M,,*06
+         1  2  3  4  5  6 7
+         |  |  |  |  |  | |
+ $--DBT,x.x,f,x.x,M,x.x,F*hh
 
-// NewGPDBT allocate echo-sounder sentence DBT (Depth Below Transducer)
+ 1) Depth, feet
+ 2) f = feet
+ 3) Depth, meters
+ 4) M = meters
+ 5) Depth, Fathoms
+ 6) F = Fathoms
+ 7) Checksum
+
+ Examples:
+ $MXDBT,108.34,f,33.02,M,18.06,F,*09
+*/
+
+// NewGPDBT allocate GPDBT struct for echo-sounder sentence DBT (Depth Below Transducer)
 func NewGPDBT(m Message) *GPDBT {
 	return &GPDBT{Message: m}
 }
@@ -59,4 +62,19 @@ func (m *GPDBT) parse() (err error) {
 	}
 
 	return nil
+}
+
+// Serialize return a valid sentence DBT as string
+func (m GPDBT) Serialize() string { // Implement NMEA interface
+
+	hdr := TypeIDs["GPDBT"]
+	fields := make([]string, 0)
+	fields = append(fields,
+		fmt.Sprintf("%03.1f", m.DepthInFeet), "f",
+		fmt.Sprintf("%03.1f", m.DepthInMeters), "M",
+		fmt.Sprintf("%03.1f", m.DepthInFathoms), "F")
+	msg := Message{Type: hdr, Fields: fields}
+	msg.Checksum = msg.ComputeChecksum()
+
+	return msg.Serialize()
 }

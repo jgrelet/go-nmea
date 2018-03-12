@@ -13,50 +13,71 @@ const (
 	Suffix = "*"
 
 	// Talker IDs
-	TalkerIDProprietary TalkerID = "P"  // P for pro proprietary message
-	TalkerIDGPS         TalkerID = "GP" // Global Positioning System receiver
-	TalkerIDLC          TalkerID = "LC" // Loran-C receiver
-	TalkerIDII          TalkerID = "II" // Integrated Instrumentation
-	TalkerIDIN          TalkerID = "IN" // Integrated Navigation
-	TalkerIDEC          TalkerID = "EC" // Electronic Chart Display & Information System (ECDIS)
-	TalkerIDCD          TalkerID = "CD" // Digital Selective Calling (DSC)
-	TalkerIDGA          TalkerID = "GA" // Galileo Positioning System
-	TalkerIDGL          TalkerID = "GL" // GLONASS, according to IEIC 61162-1
-	TalkerIDGN          TalkerID = "GN" // Mixed GPS and GLONASS data, according to IEIC 61162-1
-	TalkerIDGB          TalkerID = "GB" // BeiDou (China)
-	TalkerIDBD          TalkerID = "BD" // BeiDou (China)
-	TalkerIDQZ          TalkerID = "QZ" // QZSS regional GPS augmentation system (Japan)
+
+	// TalkerIDProprietary for pro proprietary message
+	TalkerIDProprietary TalkerID = "P"
+	// TalkerIDGPS Global Positioning System receiver
+	TalkerIDGPS TalkerID = "GP"
+	// TalkerIDLC Loran-C receiver
+	TalkerIDLC TalkerID = "LC"
+	// TalkerIDII Integrated Instrumentation
+	TalkerIDII TalkerID = "II"
+	// TalkerIDIN Integrated Navigation
+	TalkerIDIN TalkerID = "IN"
+	// TalkerIDEC Electronic Chart Display & Information System (ECDIS)
+	TalkerIDEC TalkerID = "EC"
+	// TalkerIDCD Digital Selective Calling (DSC)
+	TalkerIDCD TalkerID = "CD"
+	// TalkerIDGA Galileo Positioning System
+	TalkerIDGA TalkerID = "GA"
+	// TalkerIDGL GLONASS, according to IEIC 61162-1
+	TalkerIDGL TalkerID = "GL"
+	// TalkerIDGN Mixed GPS and GLONASS data, according to IEIC 61162-1
+	TalkerIDGN TalkerID = "GN"
+	// TalkerIDGB BeiDou (China)
+	TalkerIDGB TalkerID = "GB"
+	// TalkerIDBD BeiDou (China)
+	TalkerIDBD TalkerID = "BD"
+	// TalkerIDQZ QZSS regional GPS augmentation system (Japan)
+	TalkerIDQZ TalkerID = "QZ"
 )
 
+// TypeID struct
 type TypeID struct {
 	Talker TalkerID
 	Code   string
 }
 
+// GetTypeID return TypeID
 func (t TypeID) GetTypeID() TypeID {
 	return t
 }
 
+// Serialize TypeID struct with Talker and Code
 func (t TypeID) Serialize() string {
 	return t.Talker.Serialize() + t.Code
 }
 
+// MtkTypeID struct
 type MtkTypeID struct {
 	TypeID
 	PacketType string
 }
 
+// Serialize MtkTypeID struct with TypeID and PacketType
 func (t MtkTypeID) Serialize() string {
 	return t.TypeID.Serialize() + t.PacketType
 }
 
+// TalkerID type as string
 type TalkerID string
 
+// Serialize return TalkerID as string
 func (t TalkerID) Serialize() string {
 	return string(t)
 }
 
-// Dictionnary of all kind of NMEA message header by full-code
+// TypeIDs is a dictionnary of all kind of NMEA message header by full-code
 var TypeIDs map[string]Header
 
 func init() {
@@ -156,12 +177,16 @@ func init() {
 }
 
 const (
-	Valid   DataValid = true
+	// Valid is a DataValid type boolean
+	Valid DataValid = true
+	// Invalid is a DataValid type boolean
 	Invalid DataValid = false
 )
 
+// DataValid is a boolean
 type DataValid bool
 
+// Serialize return DataValid as string
 func (v DataValid) Serialize() string {
 	if v == Valid {
 		return "A"
@@ -170,17 +195,23 @@ func (v DataValid) Serialize() string {
 }
 
 const (
-	NoFixMode           PositioningMode = "N"
-	AutonomousGNSSFix   PositioningMode = "A"
+	// NoFixMode is a PositioningMode type as string "N"
+	NoFixMode PositioningMode = "N"
+	// AutonomousGNSSFix is a PositioningMode type as string "A"
+	AutonomousGNSSFix PositioningMode = "A"
+	// DifferentialGNSSFix is a PositioningMode type as string "D"
 	DifferentialGNSSFix PositioningMode = "D"
 )
 
+// PositioningMode type as string
 type PositioningMode string
 
+// Serialize return PositioningMode as string
 func (p PositioningMode) Serialize() string {
 	return string(p)
 }
 
+// String return PositioningMode as human description string
 func (p PositioningMode) String() string {
 	switch p {
 	case NoFixMode:
@@ -194,6 +225,8 @@ func (p PositioningMode) String() string {
 	}
 }
 
+// ParsePositioningMode check PositioningMode validity, return an error
+// "unknow value" if not
 func ParsePositioningMode(raw string) (pm PositioningMode, err error) {
 	pm = PositioningMode(raw)
 	switch pm {
@@ -205,18 +238,25 @@ func ParsePositioningMode(raw string) (pm PositioningMode, err error) {
 }
 
 const (
-	ERROR   Severity = "00"
+	// ERROR is "00"
+	ERROR Severity = "00"
+	// WARNING is "01"
 	WARNING Severity = "01"
-	NOTICE  Severity = "02"
-	USER    Severity = "07"
+	// NOTICE is "02"
+	NOTICE Severity = "02"
+	// USER is "07"
+	USER Severity = "07"
 )
 
+// Severity type as string
 type Severity string
 
+// Serialize return Severity as string
 func (s Severity) Serialize() string {
 	return string(s)
 }
 
+// String return Severity as human string
 func (s Severity) String() string {
 	switch s {
 	case ERROR:
@@ -232,6 +272,8 @@ func (s Severity) String() string {
 	}
 }
 
+// ParseSeverity check Severity validity, return an error
+// "unknow value" if not
 func ParseSeverity(raw string) (s Severity, err error) {
 	s = Severity(raw)
 	switch s {

@@ -24,12 +24,12 @@ Examples:
 $GPVTG,0.0,T,,M,0.0,N,0.1,K,A*0C
 */
 
-// NewGPVTG construct VTG message
+// NewGPVTG allocate vessel track sentence VTG
 func NewGPVTG(m Message) *GPVTG {
 	return &GPVTG{Message: m}
 }
 
-// GPVTG
+// GPVTG struct
 type GPVTG struct {
 	Message
 
@@ -70,7 +70,7 @@ func (m *GPVTG) parse() (err error) {
 	return nil
 }
 
-// Serialize return a valid payload as string
+// Serialize return a valid sentence VTG as string
 func (m GPVTG) Serialize() string { // Implement NMEA interface
 
 	hdr := TypeIDs["GPVTG"]

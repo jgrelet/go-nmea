@@ -6,17 +6,44 @@ import (
 	"strings"
 )
 
-// Examples:
-// $GPGSV,3,1,12,01,05,060,18,02,17,259,43,04,56,287,28,09,08,277,28*77
-// $GPGSV,3,2,12,10,34,195,46,13,08,125,45,17,67,014,,20,32,048,24*74
-// $GPGSV,3,3,12,23,13,094,48,24,04,292,24,28,49,178,46,32,06,037,22*7D
+/*
+GSV Satellites in view
+       1 2 3 4 5 6 7     n
+       | | | | | | |     |
+$--GSV,x,x,x,x,x,x,x,...*hh
+1) total number of messages
+2) message number
+3) satellites in view
+4) satellite number
+5) elevation in degrees
+6) azimuth in degrees to true
+7) SNR in dB
+more satellite infos like 4)-7)
+n) Checksum
 
+ Examples:
+ $GPGSV,3,1,12,01,05,060,18,02,17,259,43,04,56,287,28,09,08,277,28*77
+ $GPGSV,3,2,12,10,34,195,46,13,08,125,45,17,67,014,,20,32,048,24*74
+ $GPGSV,3,3,12,23,13,094,48,24,04,292,24,28,49,178,46,32,06,037,22*7D
+*/
+
+// NewGPGSV allocate GPGSV struct for GSV sentence (Satellites in view)
 func NewGPGSV(m Message) *GPGSV {
 	return &GPGSV{Message: m}
 }
 
+// GPGSV struct
+type GPGSV struct {
+	Message
+	NbOfMessage      int // Number of messages, total number of GPGSV messages being output (1 ~ 3)
+	SequenceNumber   int // Sequence number of this entry (1 ~ 3)
+	SatellitesInView int
+	Satellites       []Satellite
+}
+
+// Satellite struct
 type Satellite struct {
-	Id        string
+	ID        string
 	Elevation *int // Elevation in degree (0 ~ 90)
 	Azimuth   *int // Azimuth in degree (0 ~ 359)
 	SNR       *int // Signal to Noise Ration in dBHz (0 ~ 99), empty if not tracking
@@ -27,7 +54,7 @@ func newSatelliteFromFields(f []string) (s Satellite, err error) {
 		return s, fmt.Errorf("Not enought fields for create satellite")
 	}
 
-	s.Id = f[0]
+	s.ID = f[0]
 
 	if el := strings.TrimSpace(f[1]); len(el) > 0 {
 		var elevation int
@@ -56,14 +83,6 @@ func newSatelliteFromFields(f []string) (s Satellite, err error) {
 	}
 
 	return
-}
-
-type GPGSV struct {
-	Message
-	NbOfMessage      int // Number of messages, total number of GPGSV messages being output (1 ~ 3)
-	SequenceNumber   int // Sequence number of this entry (1 ~ 3)
-	SatellitesInView int
-	Satellites       []Satellite
 }
 
 func (m *GPGSV) parse() (err error) {
@@ -120,6 +139,7 @@ func (m *GPGSV) parse() (err error) {
 	return nil
 }
 
+// Serialize return a valid sentence GSV as string
 func (m GPGSV) Serialize() string { // Implement NMEA interface
 	hdr := TypeIDs["GPGSV"]
 	fields := make([]string, 0)
@@ -131,7 +151,7 @@ func (m GPGSV) Serialize() string { // Implement NMEA interface
 	)
 
 	for _, s := range m.Satellites {
-		fields = append(fields, s.Id)
+		fields = append(fields, s.ID)
 
 		if s.Elevation != nil {
 			fields = append(fields, PrependXZero(float64(*s.Elevation), "%.0f", 2))

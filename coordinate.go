@@ -7,20 +7,27 @@ import (
 	"strings"
 )
 
+// Allowed cardinal points
 const (
-	// Allowed cardinal points
+	// North as CardinalPoint and value "N"
 	North CardinalPoint = "N"
+	// South as CardinalPoint and value "S"
 	South CardinalPoint = "S"
-	East  CardinalPoint = "E"
-	West  CardinalPoint = "W"
+	// East as CardinalPoint and value "E"
+	East CardinalPoint = "E"
+	// West as CardinalPoint and value "W"
+	West CardinalPoint = "W"
 )
 
+// CardinalPoint type as string
 type CardinalPoint string
 
 func (c CardinalPoint) String() string {
 	return string(c)
 }
 
+// ParseCardinalPoint check CardinalPoint validity, return an error
+// "unknow value" if not
 func ParseCardinalPoint(raw string) (cp CardinalPoint, err error) {
 	cp = CardinalPoint(raw)
 	switch cp {
@@ -36,15 +43,17 @@ const (
 	// Min is the minimum value allowed for a LatLong
 	//MinLong LatLong = -180
 	//MinLat LatLong = -90
-	// Max is the maximum value allowed for a LatLong
+
+	// MaxLong is the maximum value allowed for a longitude
 	MaxLong float64 = 180
-	MaxLat  float64 = 90
+	// MaxLat is the maximum value allowed for a latitude
+	MaxLat float64 = 90
 )
 
+// LatLong type as float64
 type LatLong float64
 
 // NewLatLong parses input has coordinate or return error
-//
 // Allowed format:
 // - DMS (Degrees, Minutes, Secondes), ie: "N 31° 50' 72.38'"
 // - DD (Decimal Degree), ie: "31.8534389" "22.870216666666668"
