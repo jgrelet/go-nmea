@@ -2,8 +2,7 @@ package nmea
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
+	"time"
 )
 
 /*
