@@ -152,6 +152,10 @@ func Parse(raw string) (NMEA, error) {
 		gpdbt := NewGPDBT(*m)
 		err = gpdbt.parse()
 		return gpdbt, err
+	case "GPZDA":
+		gpzda := NewGPZDA(*m)
+		err = gpzda.parse()
+		return gpzda, err
 	}
 
 	return m, err
